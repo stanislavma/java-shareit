@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.storage;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -53,4 +52,5 @@ public class UserStorageMemoryImpl implements UserStorage {
     public Optional<UserDto> getByEmail(String email) {
         return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
     }
+
 }

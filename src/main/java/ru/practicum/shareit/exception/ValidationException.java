@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public class ValidationException extends RuntimeException {
+
     private final HttpStatus status;
 
     public ValidationException(String message, HttpStatus status) {
