@@ -3,17 +3,23 @@ package ru.practicum.shareit.item.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 @Data
 @Builder
 public class ItemDto {
 
     private Long id;
 
+    @NotNull(message = "Имя вещи является обязательным!")
     private String name;
 
+    @NotNull(message = "Описание вещи не может быть пустым!")
     private String description;
 
-    private boolean available;
+    @NotNull(message = "Доступность вещи является обязательным!")
+    private Boolean available;
 
     private Long ownerId;
 

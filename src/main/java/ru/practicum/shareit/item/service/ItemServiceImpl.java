@@ -8,6 +8,7 @@ import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,18 +19,28 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage;
+    private final UserService userService;
 
     @Override
     public ItemDto add(ItemDto itemDto, Long userId) {
+        userService.getById(userId); // если пользователя нет, то метод сам пробросит ошибку
+
         if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
             throw new ValidationException("Имя вещи является обязательным!", HttpStatus.BAD_REQUEST);
         }
+
+        if (itemDto.getAvailable() == null) {
+            throw new ValidationException("Доступность вещи является обязательным!", HttpStatus.BAD_REQUEST);
+        }
+
         itemDto.setOwnerId(userId);
         return itemStorage.add(itemDto);
     }
 
     @Override
     public ItemDto update(ItemDto itemDto, Long userId) {
+        userService.getById(userId); // если пользователя нет, то метод сам пробросит ошибку
+
         ItemDto existingItem = itemStorage.getById(itemDto.getId())
                 .orElseThrow(() -> {
                     String errorText = "Вещь не найдена: " + itemDto.getId();
@@ -49,7 +60,9 @@ public class ItemServiceImpl implements ItemService {
             existingItem.setDescription(itemDto.getDescription());
         }
 
-        existingItem.setAvailable(itemDto.isAvailable());
+        if (itemDto.getAvailable() != null) {
+            existingItem.setAvailable(itemDto.getAvailable());
+        }
 
         return itemStorage.update(existingItem);
     }

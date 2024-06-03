@@ -50,7 +50,7 @@ public class ItemStorageMemoryImpl implements ItemStorage {
         return items.values().stream()
                 .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase()) ||
                         item.getDescription().toLowerCase().contains(text.toLowerCase()))
-                .filter(ItemDto::isAvailable)
+                .filter(ItemDto::getAvailable)
                 .collect(Collectors.toList());
     }
 
