@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface ItemStorage {
 
     ItemDto add(ItemDto item);
+
     ItemDto update(ItemDto item);
 
     Optional<ItemDto> getById(Long id);

@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface UserStorage {
 
     UserDto add(UserDto user);
+
     UserDto update(UserDto user);
 
     Optional<UserDto> getById(Long id);
