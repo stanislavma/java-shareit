@@ -2,13 +2,14 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,37 +20,24 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage;
-    private final UserService userService;
+    private final UserStorage userStorage;
 
     @Override
     public ItemDto add(ItemDto itemDto, Long userId) {
-        userService.getById(userId); // если пользователя нет, то метод сам пробросит ошибку
-
-        if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
-            throw new ValidationException("Имя вещи является обязательным!", HttpStatus.BAD_REQUEST);
-        }
-
-        if (itemDto.getAvailable() == null) {
-            throw new ValidationException("Доступность вещи является обязательным!", HttpStatus.BAD_REQUEST);
-        }
+        validateIsUserExists(userId); // если пользователя нет, то метод сам пробросит ошибку
 
         itemDto.setOwnerId(userId);
-        return itemStorage.add(itemDto);
+        return ItemMapper.toItemDto(itemStorage.add(ItemMapper.toItem(itemDto)));
     }
 
     @Override
     public ItemDto update(ItemDto itemDto, Long userId) {
-        userService.getById(userId); // если пользователя нет, то метод сам пробросит ошибку
+        validateIsUserExists(userId); // если пользователя нет, то метод сам пробросит ошибку
 
-        ItemDto existingItem = itemStorage.getById(itemDto.getId())
-                .orElseThrow(() -> {
-                    String errorText = "Вещь не найдена: " + itemDto.getId();
-                    log.error(errorText);
-                    return new EntityNotFoundException(errorText);
-                });
+        ItemDto existingItem = getById(itemDto.getId());
 
         if (!existingItem.getOwnerId().equals(userId)) {
-            throw new EntityNotFoundException("Item not found!");
+            throw new AccessDeniedException("Нет доступа к вещи!");
         }
 
         if (itemDto.getName() != null) {
@@ -64,28 +52,40 @@ public class ItemServiceImpl implements ItemService {
             existingItem.setAvailable(itemDto.getAvailable());
         }
 
-        return itemStorage.update(existingItem);
+        return ItemMapper.toItemDto(itemStorage.update(ItemMapper.toItem(existingItem)));
     }
 
     @Override
     public ItemDto getById(Long itemId) {
-        return itemStorage.getById(itemId)
+        Item item = itemStorage.getById(itemId)
                 .orElseThrow(() -> {
                     String errorText = "Вещь не найдена: " + itemId;
                     log.error(errorText);
                     return new EntityNotFoundException(errorText);
                 });
+
+        return ItemMapper.toItemDto(item);
     }
 
     public List<ItemDto> getItemsByOwnerId(Long userId) {
-        return itemStorage.getItemsByOwnerId(userId);
+        return ItemMapper.toItemDto(itemStorage.getItemsByOwnerId(userId));
     }
 
     public List<ItemDto> getItemsByText(String text) {
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
         }
-        return itemStorage.getItemsByText(text);
+
+        return ItemMapper.toItemDto(itemStorage.getItemsByText(text));
+    }
+
+    private void validateIsUserExists(long userId) {
+        userStorage.getById(userId)
+                .orElseThrow(() -> {
+                    String errorText = "Пользователь не найден: " + userId;
+                    log.error(errorText);
+                    return new EntityNotFoundException(errorText);
+                });
     }
 
 }

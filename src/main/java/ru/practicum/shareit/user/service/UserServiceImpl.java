@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
@@ -20,30 +22,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto userDto) {
-        if (userDto.getEmail() == null || userDto.getEmail().isEmpty()) {
-            throw new ValidationException("Email обязательное поле!", HttpStatus.BAD_REQUEST);
-        }
+        validateIsEmailExist(userDto);
 
-        if (userStorage.getByEmail(userDto.getEmail()).isPresent()) {
-            throw new ValidationException("Email уже существует в системе!", HttpStatus.CONFLICT);
-        }
-
-        return userStorage.add(userDto);
+        return UserMapper.toUserDto(userStorage.add(UserMapper.toUser(userDto)));
     }
 
     @Override
     public UserDto update(UserDto userDto) {
-        UserDto existingUser = userStorage.getById(userDto.getId())
-                .orElseThrow(() -> {
-                    String errorText = "Пользователь не найден: " + userDto.getId();
-                    log.error(errorText);
-                    return new EntityNotFoundException(errorText);
-                });
+        UserDto existingUser = getById(userDto.getId());
 
         if (userDto.getEmail() != null && !userDto.getEmail().equals(existingUser.getEmail())) {
-            if (userStorage.getByEmail(userDto.getEmail()).isPresent()) {
-                throw new ValidationException("Email уже имеется в системе", HttpStatus.CONFLICT);
-            }
+            validateIsEmailExist(userDto);
         }
 
         if (userDto.getName() != null) {
@@ -54,31 +43,37 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(userDto.getEmail());
         }
 
-        return userStorage.update(existingUser);
+        return UserMapper.toUserDto(userStorage.update(UserMapper.toUser(existingUser)));
+    }
+
+    private void validateIsEmailExist(UserDto userDto) {
+        if (userStorage.getByEmail(userDto.getEmail()).isPresent()) {
+            throw new ValidationException("Email уже имеется в системе", HttpStatus.CONFLICT);
+        }
     }
 
     @Override
     public UserDto getById(long userId) {
-        return userStorage.getById(userId)
+        User user = userStorage.getById(userId)
                 .orElseThrow(() -> {
                     String errorText = "Пользователь не найден: " + userId;
                     log.error(errorText);
                     return new EntityNotFoundException(errorText);
                 });
+
+        return UserMapper.toUserDto(user);
     }
 
     @Override
     public UserDto delete(long userId) {
-        if (!userStorage.getById(userId).isPresent()) {
-            throw new EntityNotFoundException("Email не найден: " + userId);
-        }
+        getById(userId);
 
-        return userStorage.deleteById(userId);
+        return UserMapper.toUserDto(userStorage.deleteById(userId));
     }
 
     @Override
     public List<UserDto> getAll() {
-        return userStorage.getAll();
+        return UserMapper.toUserDto(userStorage.getAll());
     }
 
 }
