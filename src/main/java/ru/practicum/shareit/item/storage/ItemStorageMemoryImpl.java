@@ -40,7 +40,7 @@ public class ItemStorageMemoryImpl implements ItemStorage {
     @Override
     public List<Item> getItemsByOwnerId(Long ownerId) {
         return items.values().stream()
-                .filter(item -> item.getOwnerId().equals(ownerId))
+                .filter(item -> item.getOwner().getId().equals(ownerId))
                 .collect(Collectors.toList());
     }
 

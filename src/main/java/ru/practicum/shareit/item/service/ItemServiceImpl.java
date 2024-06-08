@@ -27,7 +27,7 @@ public class ItemServiceImpl implements ItemService {
         validateIsUserExists(userId); // если пользователя нет, то метод сам пробросит ошибку
 
         itemDto.setOwnerId(userId);
-        return ItemMapper.toItemDto(itemStorage.add(ItemMapper.toItem(itemDto)));
+        return ItemMapper.toItemDto(itemStorage.add(ItemMapper.toItem(itemDto, null, null)));
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
             existingItem.setAvailable(itemDto.getAvailable());
         }
 
-        return ItemMapper.toItemDto(itemStorage.update(ItemMapper.toItem(existingItem)));
+        return ItemMapper.toItemDto(itemStorage.update(ItemMapper.toItem(existingItem, null, null)));
     }
 
     @Override

@@ -1,7 +1,8 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.item;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -12,12 +13,10 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "bookings")
-public class Booking {
-
+@Table(name = "comments")
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
     @NotNull
@@ -27,17 +26,15 @@ public class Booking {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "booker_id", nullable = false)
-    private User booker;
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
-    @Column(name = "start_date")
-    private Instant startDate;
+    @NotNull
+    @Column(name = "created_date", nullable = false)
+    private Instant createdDate;
 
-    @Column(name = "end_date")
-    private Instant endDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private BookingStatus status;
+    @Column(name = "text")
+    @Type(type = "org.hibernate.type.TextType")
+    private String text;
 
 }

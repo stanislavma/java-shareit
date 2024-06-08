@@ -2,6 +2,8 @@ package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.Request;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,8 +20,8 @@ public class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .ownerId(item.getOwnerId() != null ? item.getOwnerId() : null)
-                .requestId(item.getRequestId() != null ? item.getRequestId() : null)
+                .ownerId(item.getOwner() != null ? item.getOwner().getId() : null)
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null)
                 .build();
     }
 
@@ -29,7 +31,7 @@ public class ItemMapper {
                 .collect(Collectors.toList());
     }
 
-    public static Item toItem(ItemDto dto) {
+    public static Item toItem(ItemDto dto, User owner, Request request) {
         if (dto == null) {
             return null;
         }
@@ -39,8 +41,8 @@ public class ItemMapper {
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .available(dto.getAvailable())
-                .ownerId(dto.getOwnerId() != null ? dto.getOwnerId() : null)
-                .requestId(dto.getRequestId() != null ? dto.getRequestId() : null)
+                .owner(owner)
+                .request(request)
                 .build();
     }
 
