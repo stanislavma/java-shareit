@@ -21,8 +21,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto userDto) {
-        validateIsEmailExist(userDto);
-
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 

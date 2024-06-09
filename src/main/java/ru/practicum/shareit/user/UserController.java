@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * TODO Sprint add-controllers.
+ * User rest controller
  */
 @Slf4j
 @RestController

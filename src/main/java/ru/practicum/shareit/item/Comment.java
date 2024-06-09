@@ -8,7 +8,7 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -31,7 +31,7 @@ public class Comment {
 
     @NotNull
     @Column(name = "created_date", nullable = false)
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "text")
     @Type(type = "org.hibernate.type.TextType")
