@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.constraints.NotEmpty;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Builder
+@Jacksonized
 public class ItemDto {
 
     private Long id;
