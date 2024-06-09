@@ -1,0 +1,5 @@
+DELETE FROM items ;
+DELETE FROM users ;
+
+ALTER SEQUENCE items_id_seq RESTART WITH 1;
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
