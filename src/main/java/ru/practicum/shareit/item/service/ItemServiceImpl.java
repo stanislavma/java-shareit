@@ -2,9 +2,12 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -35,9 +38,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(ItemDto itemDto, Long userId) {
         findUserById(userId); // если пользователя нет, то метод сам пробросит ошибку
 
-        ItemDto existingItem = getById(itemDto.getId());
+        Item existingItem = getItemById(itemDto.getId());
 
-        if (!existingItem.getOwnerId().equals(userId)) {
+        if (!existingItem.getOwner().getId().equals(userId)) {
             throw new AccessDeniedException("Нет доступа к вещи!");
         }
 
@@ -54,19 +57,25 @@ public class ItemServiceImpl implements ItemService {
         }
 
         User user = findUserById(userId);
-        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(existingItem, user, null)));
+        return ItemMapper.toItemDto(itemRepository.save(existingItem));
     }
 
     @Override
-    public ItemDto getById(Long itemId) {
-        Item item = itemRepository.findById(itemId)
+    public ItemDto getById(Long userId, Long itemId) {
+        findUserById(userId);
+
+        Item item = getItemById(itemId);
+
+        return ItemMapper.toItemDto(item);
+    }
+
+    private Item getItemById(Long itemId) {
+        return itemRepository.findById(itemId)
                 .orElseThrow(() -> {
                     String errorText = "Вещь не найдена: " + itemId;
                     log.error(errorText);
                     return new EntityNotFoundException(errorText);
                 });
-
-        return ItemMapper.toItemDto(item);
     }
 
     public List<ItemDto> getItemsByOwnerId(Long userId) {
