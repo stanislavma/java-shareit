@@ -51,7 +51,7 @@ public class BookingController {
 
         BookingState bookingState = getBookingState(state);
 
-        return ResponseEntity.ok(bookingService.getAll(userId, bookingState));
+        return ResponseEntity.ok(bookingService.getAllByBookerId(userId, bookingState));
     }
 
     @GetMapping("/owner")

@@ -12,16 +12,18 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
+    List<Booking> findAllByBookerId(Long bookerId, Sort sort);
+
     @Query("SELECT b FROM Booking b " +
             "WHERE :now BETWEEN b.startDate AND b.endDate " +
-            "ORDER BY b.id DESC")
-    List<Booking> findCurrentBookings(@Param("now") LocalDateTime now);
+            "AND b.booker.id = :bookerId")
+    List<Booking> findByBookerIdCurrent(@Param("bookerId") Long bookerId, @Param("now") LocalDateTime now);
 
-    List<Booking> findByEndDateIsBefore(LocalDateTime endDate, Sort sort);
+    List<Booking> findByBookerIdAndEndDateIsBefore(Long bookerId, LocalDateTime endDate, Sort sort);
 
-    List<Booking> findByStartDateIsAfter(LocalDateTime startDate, Sort sort);
+    List<Booking> findByBookerIdAndStartDateIsAfter(Long bookerId, LocalDateTime startDate, Sort sort);
 
-    List<Booking> findByStatus(BookingStatus status, Sort sort);
+    List<Booking> findByBookerIdAndStatus(Long bookerId, BookingStatus status, Sort sort);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = :ownerId " +

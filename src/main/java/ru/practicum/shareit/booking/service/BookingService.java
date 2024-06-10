@@ -9,13 +9,11 @@ public interface BookingService {
 
     BookingDto add(BookingDto bookingDto, Long userId);
 
-    BookingDto update(BookingDto bookingDto, Long userId);
-
     BookingDto updateStatus(Long bookingId, Long userId, boolean approved);
 
     BookingDto getById(Long userId, Long bookingId);
 
-    List<BookingDto> getAll(long userId, BookingState state);
+    List<BookingDto> getAllByBookerId(long userId, BookingState state);
 
     List<BookingDto> getAllByOwnerId(long userId, BookingState state);
 
