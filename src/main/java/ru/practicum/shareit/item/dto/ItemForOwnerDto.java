@@ -1,34 +1,24 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
- * DTO for {@link Item}
+ * DTO for {@link Item} owner
  */
 @Data
-@Builder
-@Jacksonized
-public class ItemForOwnerDto {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class ItemForOwnerDto extends ItemDto {
 
-    private Long id;
+    private BookingShortDto lastBooking;
 
-    @NotEmpty(message = "Имя вещи является обязательным!")
-    private String name;
-
-    @NotEmpty(message = "Описание вещи не может быть пустым!")
-    private String description;
-
-    @NotNull(message = "Доступность вещи является обязательным!")
-    private Boolean available;
-
-    private Long ownerId;
-
-    private Long requestId;
+    private BookingShortDto nextBooking;
 
 }

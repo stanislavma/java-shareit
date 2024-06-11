@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemForOwnerDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -34,15 +35,15 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                           @PathVariable Long itemId) {
+    public ResponseEntity<ItemForOwnerDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                   @PathVariable Long itemId) {
         log.info("Получить вещь по ID - {}", itemId);
         return ResponseEntity.ok(itemService.getById(userId, itemId));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("Получить вещи по id владельцу");
+    public ResponseEntity<List<ItemForOwnerDto>> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.info("Получить все вещи владельца - {}", userId);
         return ResponseEntity.ok(itemService.getItemsByOwnerId(userId));
     }
 
