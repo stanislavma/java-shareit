@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
 
 public class BookingMapper {
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public static BookingDto toDto(Booking booking) {
         if (booking == null) {
             return null;
         }
 
-        String startDate = formatter.format(booking.getStartDate());
-        String endDate = formatter.format(booking.getEndDate());
+        String startDate = DATE_TIME_FORMATTER.format(booking.getStartDate());
+        String endDate = DATE_TIME_FORMATTER.format(booking.getEndDate());
 
         ItemDto itemDto = ItemMapper.toItemDto(booking.getItem());
         UserDto bookerDto = UserMapper.toUserDto(booking.getBooker());
@@ -67,8 +67,8 @@ public class BookingMapper {
             return null;
         }
 
-        LocalDateTime startDate = LocalDateTime.parse(dto.getStartDate(), formatter);
-        LocalDateTime endDate = LocalDateTime.parse(dto.getEndDate(), formatter);
+        LocalDateTime startDate = LocalDateTime.parse(dto.getStartDate(), DATE_TIME_FORMATTER);
+        LocalDateTime endDate = LocalDateTime.parse(dto.getEndDate(), DATE_TIME_FORMATTER);
 
         return Booking.builder()
                 .id(dto.getId())

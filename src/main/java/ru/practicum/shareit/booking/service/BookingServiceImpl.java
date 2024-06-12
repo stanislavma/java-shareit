@@ -28,7 +28,7 @@ import java.util.List;
 @Service
 public class BookingServiceImpl implements BookingService {
 
-    BookingRepository bookingRepository;
+    private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
@@ -63,10 +63,6 @@ public class BookingServiceImpl implements BookingService {
         validateOwnerAccess(userId, booking.getItem().getOwner().getId());
         validateItemAvailability(booking.getItem());
         validateStartDateBeforeEndDate(booking);
-
-        if (!booking.getItem().getOwner().getId().equals(userId)) {
-            System.out.println("check");
-        }
 
         if (booking.getStatus().equals(BookingStatus.APPROVED)) {
             throw new ValidationException("Уже подтвержден владельцем", HttpStatus.BAD_REQUEST);

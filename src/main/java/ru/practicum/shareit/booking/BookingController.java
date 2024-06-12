@@ -71,6 +71,7 @@ public class BookingController {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Unknown state: " + state);
         }
+
         return bookingState;
     }
 
