@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.Data;
-import lombok.Value;
 
 import java.io.Serializable;
 
