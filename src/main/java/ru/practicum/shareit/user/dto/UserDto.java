@@ -9,6 +9,7 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
 /**
  * DTO for {@link User}
@@ -18,7 +19,7 @@ import javax.validation.constraints.NotEmpty;
 @Jacksonized
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class UserDto {
+public class UserDto implements Serializable {
 
     private Long id;
 

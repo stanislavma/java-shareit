@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ItemForOwnerDto extends ItemDto {
+public class ItemForOwnerDto extends ItemDto  {
 
     private BookingShortDto lastBooking;
 

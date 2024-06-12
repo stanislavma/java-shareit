@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.dto;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.booking.model.Booking;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -10,7 +12,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
-public class BookingShortDto {
+public class BookingShortDto implements Serializable {
 
     private Long id;
 
