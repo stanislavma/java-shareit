@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "users", schema = "public")
+@Table(name = "users", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User {
 
     @Id
