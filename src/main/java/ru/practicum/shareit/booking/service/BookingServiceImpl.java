@@ -90,22 +90,24 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookingDto> getAllByBookerId(long userId, BookingState state) {
+    public List<BookingDto> getAllByBookerId(long userId, String state) {
+        BookingState bookingState = getBookingState(state);
         findUserById(userId);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "startDate");
-        List<Booking> bookings = getBookingsByBookerAndState(state, userId, sort);
+        List<Booking> bookings = getBookingsByBookerAndState(bookingState, userId, sort);
 
         return BookingMapper.toDto(bookings);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getAllByOwnerId(long userId, BookingState state) {
+    public List<BookingDto> getAllByOwnerId(long userId, String state) {
+        BookingState bookingState = getBookingState(state);
         findUserById(userId);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "startDate");
-        List<Booking> bookings = getBookingsByOwnerAndState(state, userId, sort);
+        List<Booking> bookings = getBookingsByOwnerAndState(bookingState, userId, sort);
 
         return BookingMapper.toDto(bookings);
     }
@@ -225,7 +227,17 @@ public class BookingServiceImpl implements BookingService {
         if (!isOwner && !isBooker) {
             throw new ValidationException("Нет доступа", HttpStatus.NOT_FOUND);
         }
+    }
 
+    private static BookingState getBookingState(String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Unknown state: " + state);
+        }
+
+        return bookingState;
     }
 
 }

@@ -132,7 +132,7 @@ public class ItemServiceImpl implements ItemService {
         User author = findUserById(userId);
         Item item = getItemById(itemId);
 
-        List<BookingDto> bookingDtoList = bookingService.getAllByBookerId(userId, BookingState.PAST);
+        List<BookingDto> bookingDtoList = bookingService.getAllByBookerId(userId, BookingState.PAST.name());
 
         boolean hasValidBooking = bookingDtoList.stream()
                 .anyMatch(booking -> booking.getItemId()
