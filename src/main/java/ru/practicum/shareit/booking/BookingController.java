@@ -46,12 +46,10 @@ public class BookingController {
 
     @GetMapping()
     public ResponseEntity<List<BookingDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                   @RequestParam(defaultValue = "ALL") String state) {
+                                                   @RequestParam(defaultValue = "ALL") BookingState state) {
         log.info("Получить все бронирования");
 
-        BookingState bookingState = getBookingState(state);
-
-        return ResponseEntity.ok(bookingService.getAllByBookerId(userId, bookingState));
+        return ResponseEntity.ok(bookingService.getAllByBookerId(userId, state));
     }
 
     @GetMapping("/owner")
