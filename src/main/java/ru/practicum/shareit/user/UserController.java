@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * TODO Sprint add-controllers.
+ * User rest controller
  */
 @Slf4j
 @RestController
@@ -35,9 +35,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDto> delete(@PathVariable long id) {
+    public ResponseEntity<Long> delete(@PathVariable long id) {
         log.info("Удаление пользователя {}", id);
-        return ResponseEntity.ok(userService.delete(id));
+        userService.delete(id);
+        return ResponseEntity.ok(id);
     }
 
     @GetMapping("/{id}")

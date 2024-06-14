@@ -5,16 +5,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
+import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
+/**
+ * DTO for {@link User}
+ */
 @Data
 @Builder
 @Jacksonized
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class UserDto {
+public class UserDto implements Serializable {
 
     private Long id;
 

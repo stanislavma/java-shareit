@@ -6,11 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
-
+import ru.practicum.shareit.user.UserRepository;
 import java.util.List;
 
 @Service
@@ -18,13 +17,11 @@ import java.util.List;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     @Override
     public UserDto add(UserDto userDto) {
-        validateIsEmailExist(userDto);
-
-        return UserMapper.toUserDto(userStorage.add(UserMapper.toUser(userDto)));
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
     @Override
@@ -43,18 +40,18 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(userDto.getEmail());
         }
 
-        return UserMapper.toUserDto(userStorage.update(UserMapper.toUser(existingUser)));
+        return UserMapper.toUserDto(userRepository.saveAndFlush(UserMapper.toUser(existingUser)));
     }
 
     private void validateIsEmailExist(UserDto userDto) {
-        if (userStorage.getByEmail(userDto.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ValidationException("Email уже имеется в системе", HttpStatus.CONFLICT);
         }
     }
 
     @Override
     public UserDto getById(long userId) {
-        User user = userStorage.getById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     String errorText = "Пользователь не найден: " + userId;
                     log.error(errorText);
@@ -65,15 +62,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto delete(long userId) {
+    public void delete(long userId) {
         getById(userId);
 
-        return UserMapper.toUserDto(userStorage.deleteById(userId));
+        userRepository.deleteById(userId);
     }
 
     @Override
     public List<UserDto> getAll() {
-        return UserMapper.toUserDto(userStorage.getAll());
+        return UserMapper.toUserDto(userRepository.findAll());
     }
 
 }

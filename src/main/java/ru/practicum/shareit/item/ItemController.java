@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemForOwnerDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -34,14 +36,15 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getById(@PathVariable Long itemId) {
+    public ResponseEntity<ItemForOwnerDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                   @PathVariable Long itemId) {
         log.info("Получить вещь по ID - {}", itemId);
-        return ResponseEntity.ok(itemService.getById(itemId));
+        return ResponseEntity.ok(itemService.getById(userId, itemId));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("Получить вещи по id владельцу");
+    public ResponseEntity<List<ItemForOwnerDto>> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.info("Получить все вещи владельца - {}", userId);
         return ResponseEntity.ok(itemService.getItemsByOwnerId(userId));
     }
 
@@ -49,6 +52,14 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> getItemsByText(@RequestParam String text) {
         log.info("Получить вещи по тексту в названии и описании");
         return ResponseEntity.ok(itemService.getItemsByText(text));
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<CommentDto> addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                 @PathVariable Long itemId,
+                                                 @Valid @RequestBody CommentDto commentDto) {
+        log.info("Добавить комментарий к вещи с ID - {}", itemId);
+        return ResponseEntity.ok(itemService.addComment(commentDto, userId, itemId));
     }
 
 }
