@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
@@ -12,7 +13,7 @@ import java.io.Serializable;
  * DTO for {@link Request}
  */
 @Data
-@Builder
+@SuperBuilder
 @Jacksonized
 public class RequestDto implements Serializable {
 
@@ -22,5 +23,8 @@ public class RequestDto implements Serializable {
 
     @NotEmpty
     String description;
+
+    @JsonProperty("created")
+    private String createdDate;
 
 }

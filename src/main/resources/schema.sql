@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS requests
 (
     id           BIGINT DEFAULT NEXTVAL('REQUESTS_ID_SEQ') PRIMARY KEY,
     requestor_id BIGINT REFERENCES users (id) NOT NULL,
-    description  TEXT NOT NULL
+    description  TEXT NOT NULL,
+    created_date TIMESTAMP WITHOUT TIME ZONE  NOT NULL
 );
 
 

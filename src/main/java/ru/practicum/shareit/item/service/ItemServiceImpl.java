@@ -25,6 +25,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.request.RequestRepository;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -45,16 +47,18 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     private final Sort itemsSort = Sort.by(Sort.Direction.ASC, "id");
+    private final RequestRepository requestRepository;
 
     @Override
     @Transactional()
     public ItemDto add(ItemDto itemDto, Long userId) {
         User user = findUserById(userId);
+        Request request = findRequestById(itemDto);
 
-        Item item = ItemMapper.toItem(itemDto, user, null);
+        Item item = ItemMapper.toEntity(itemDto, user, request);
         item.setOwner(user);
 
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        return ItemMapper.toDto(itemRepository.save(item));
     }
 
     @Override
@@ -80,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
             existingItem.setAvailable(itemDto.getAvailable());
         }
 
-        return ItemMapper.toItemDto(itemRepository.save(existingItem));
+        return ItemMapper.toDto(itemRepository.save(existingItem));
     }
 
     @Override
@@ -90,7 +94,7 @@ public class ItemServiceImpl implements ItemService {
 
         List<ItemForOwnerDto> itemForOwnerDtoList = new ArrayList<>();
         for (Item item : items) {
-            ItemForOwnerDto itemForOwnerDto = ItemMapper.toItemForOwnerDto(item);
+            ItemForOwnerDto itemForOwnerDto = ItemMapper.toEntityForOwnerDto(item);
 
             setBookingsToItem(userId, item, itemForOwnerDto);
             setCommentsToItem(item, itemForOwnerDto);
@@ -103,11 +107,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ItemDto> getItemsByRequestId(Long requestId) {
+        List<Item> items = itemRepository.findAllByRequestId(requestId, itemsSort);
+
+        return ItemMapper.toDto(items);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ItemForOwnerDto getById(Long userId, Long itemId) {
         findUserById(userId);
         Item item = getItemById(itemId);
 
-        ItemForOwnerDto itemForOwnerDto = ItemMapper.toItemForOwnerDto(item);
+        ItemForOwnerDto itemForOwnerDto = ItemMapper.toEntityForOwnerDto(item);
 
         setBookingsToItem(userId, item, itemForOwnerDto);
         setCommentsToItem(item, itemForOwnerDto);
@@ -122,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
             return new ArrayList<>();
         }
 
-        return ItemMapper.toItemDto(itemRepository.findByText(text));
+        return ItemMapper.toDto(itemRepository.findByText(text));
     }
 
     @Override
@@ -182,6 +194,20 @@ public class ItemServiceImpl implements ItemService {
                     log.error(errorText);
                     return new EntityNotFoundException(errorText);
                 });
+    }
+
+    private Request findRequestById(ItemDto itemDto) {
+        Request request = null;
+
+        if (itemDto.getRequestId() != null && itemDto.getRequestId() > 0) {
+            request = requestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> {
+                        String errorText = "Запрос на вещь не найден: " + itemDto.getRequestId();
+                        log.error(errorText);
+                        return new EntityNotFoundException(errorText);
+                    });
+        }
+        return request;
     }
 
     private static Booking getLastBooking(List<Booking> bookings) {

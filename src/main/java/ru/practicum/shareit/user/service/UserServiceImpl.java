@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto add(UserDto userDto) {
-        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
+        return UserMapper.toDto(userRepository.save(UserMapper.toEntity(userDto)));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(userDto.getEmail());
         }
 
-        return UserMapper.toUserDto(userRepository.saveAndFlush(UserMapper.toUser(existingUser)));
+        return UserMapper.toDto(userRepository.saveAndFlush(UserMapper.toEntity(existingUser)));
     }
 
     private void validateIsEmailExist(UserDto userDto) {
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
                     return new EntityNotFoundException(errorText);
                 });
 
-        return UserMapper.toUserDto(user);
+        return UserMapper.toDto(user);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll() {
-        return UserMapper.toUserDto(userRepository.findAll());
+        return UserMapper.toDto(userRepository.findAll());
     }
 
 }
