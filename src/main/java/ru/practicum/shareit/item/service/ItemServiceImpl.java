@@ -44,7 +44,6 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-
     private final Sort itemsSort = Sort.by(Sort.Direction.ASC, "id");
 
     @Override

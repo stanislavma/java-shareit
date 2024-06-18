@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemForOwnerDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.Request;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
