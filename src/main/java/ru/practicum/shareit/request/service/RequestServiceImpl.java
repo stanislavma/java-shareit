@@ -72,7 +72,6 @@ public class RequestServiceImpl implements RequestService {
     @Transactional(readOnly = true)
     public List<RequestWithItemsDto> getAllByUserIdAndPageable(Long userId, Integer from, Integer size) {
         findUserById(userId);
-
         validatePageable(from, size);
 
         Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, requestsSort);

@@ -43,15 +43,19 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemForOwnerDto>> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<List<ItemForOwnerDto>> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                                   @RequestParam(defaultValue = "0") int from,
+                                                                   @RequestParam(defaultValue = "10") int size) {
         log.info("Получить все вещи владельца - {}", userId);
-        return ResponseEntity.ok(itemService.getItemsByOwnerId(userId));
+        return ResponseEntity.ok(itemService.getItemsByOwnerId(userId, from, size));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> getItemsByText(@RequestParam String text) {
+    public ResponseEntity<List<ItemDto>> getItemsByText(@RequestParam String text,
+                                                        @RequestParam(defaultValue = "0") int from,
+                                                        @RequestParam(defaultValue = "10") int size) {
         log.info("Получить вещи по тексту в названии и описании");
-        return ResponseEntity.ok(itemService.getItemsByText(text));
+        return ResponseEntity.ok(itemService.getItemsByText(text, from, size));
     }
 
     @PostMapping("/{itemId}/comment")

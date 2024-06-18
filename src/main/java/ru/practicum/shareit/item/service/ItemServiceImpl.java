@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -89,8 +91,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemForOwnerDto> getItemsByOwnerId(Long userId) {
-        List<Item> items = itemRepository.findAllByOwnerId(userId, itemsSort);
+    public List<ItemForOwnerDto> getItemsByOwnerId(Long userId, Integer from, Integer size) {
+        validatePageable(from, size);
+
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, itemsSort);
+        List<Item> items = itemRepository.findAllByOwnerId(userId, pageable);
 
         List<ItemForOwnerDto> itemForOwnerDtoList = new ArrayList<>();
         for (Item item : items) {
@@ -129,12 +134,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getItemsByText(String text) {
+    public List<ItemDto> getItemsByText(String text, Integer from, Integer size) {
+        validatePageable(from, size);
+
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
         }
 
-        return ItemMapper.toDto(itemRepository.findByText(text));
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, itemsSort);
+        return ItemMapper.toDto(itemRepository.findByText(text, pageable));
     }
 
     @Override
@@ -224,6 +232,16 @@ public class ItemServiceImpl implements ItemService {
                 .filter(b -> b.getStartDate().isAfter(LocalDateTime.now()))
                 .min(Comparator.comparing(Booking::getStartDate))
                 .orElse(null);
+    }
+
+    private static void validatePageable(Integer from, Integer size) {
+        if (from == null || from < 0) {
+            throw new ValidationException("Неверный индекс страницы", HttpStatus.BAD_REQUEST);
+        }
+
+        if (size == null || size < 0) {
+            throw new ValidationException("Неверное количество элементов на странице", HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
