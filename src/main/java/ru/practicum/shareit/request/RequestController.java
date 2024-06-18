@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemForOwnerDto;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.dto.RequestForOwnerDto;
 import ru.practicum.shareit.request.dto.RequestWithItemsDto;
@@ -47,7 +46,7 @@ public class RequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<RequestWithItemsDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                   @PathVariable Long requestId) {
+                                                       @PathVariable Long requestId) {
         log.info("Получить вещь по ID - {}", requestId);
         return ResponseEntity.ok(requestService.getRequestById(userId, requestId));
     }

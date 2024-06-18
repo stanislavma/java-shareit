@@ -53,7 +53,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional()
     public ItemDto add(ItemDto itemDto, Long userId) {
         User user = findUserById(userId);
-        Request request = findRequestById(itemDto);
+        Request request = findRequestById(itemDto.getRequestId());
 
         Item item = ItemMapper.toEntity(itemDto, user, request);
         item.setOwner(user);
@@ -143,7 +143,7 @@ public class ItemServiceImpl implements ItemService {
         User author = findUserById(userId);
         Item item = getItemById(itemId);
 
-        List<BookingDto> bookingDtoList = bookingService.getAllByBookerId(userId, BookingState.PAST.name());
+        List<BookingDto> bookingDtoList = bookingService.getAllByBookerId(userId, BookingState.PAST.name(), 0, 100);
 
         boolean hasValidBooking = bookingDtoList.stream()
                 .anyMatch(booking -> booking.getItemId()
@@ -157,26 +157,6 @@ public class ItemServiceImpl implements ItemService {
 
         return CommentMapper.toDto(commentRepository.save(comment));
     }
-
-    private void setBookingsToItem(Long userId, Item item, ItemForOwnerDto itemForOwnerDto) {
-        if (item.getOwner().getId().equals(userId)) {
-            List<Booking> bookings = bookingRepository.findAllByItemId(item.getId(), itemsSort);
-
-            Booking lastBooking = getLastBooking(bookings);
-            Booking nextBooking = getNextBooking(bookings);
-
-            itemForOwnerDto.setLastBooking(BookingMapper.toShortDto(lastBooking));
-            itemForOwnerDto.setNextBooking(BookingMapper.toShortDto(nextBooking));
-        }
-    }
-
-    private void setCommentsToItem(Item item, ItemForOwnerDto itemForOwnerDto) {
-        List<Comment> comments = commentRepository.findAllByItemId(item.getId());
-
-        List<CommentDto> commentDtoList = CommentMapper.toDto(comments);
-        itemForOwnerDto.setComments(commentDtoList);
-    }
-
 
     private Item getItemById(Long itemId) {
         return itemRepository.findById(itemId)
@@ -196,18 +176,38 @@ public class ItemServiceImpl implements ItemService {
                 });
     }
 
-    private Request findRequestById(ItemDto itemDto) {
+    private Request findRequestById(Long requestId) {
         Request request = null;
 
-        if (itemDto.getRequestId() != null && itemDto.getRequestId() > 0) {
-            request = requestRepository.findById(itemDto.getRequestId())
+        if (requestId != null && requestId > 0) {
+            request = requestRepository.findById(requestId)
                     .orElseThrow(() -> {
-                        String errorText = "Запрос на вещь не найден: " + itemDto.getRequestId();
+                        String errorText = "Запрос на вещь не найден: " + requestId;
                         log.error(errorText);
                         return new EntityNotFoundException(errorText);
                     });
         }
+
         return request;
+    }
+
+    private void setBookingsToItem(Long userId, Item item, ItemForOwnerDto itemForOwnerDto) {
+        if (item.getOwner().getId().equals(userId)) {
+            List<Booking> bookings = bookingRepository.findAllByItemId(item.getId(), itemsSort);
+
+            Booking lastBooking = getLastBooking(bookings);
+            Booking nextBooking = getNextBooking(bookings);
+
+            itemForOwnerDto.setLastBooking(BookingMapper.toShortDto(lastBooking));
+            itemForOwnerDto.setNextBooking(BookingMapper.toShortDto(nextBooking));
+        }
+    }
+
+    private void setCommentsToItem(Item item, ItemForOwnerDto itemForOwnerDto) {
+        List<Comment> comments = commentRepository.findAllByItemId(item.getId());
+
+        List<CommentDto> commentDtoList = CommentMapper.toDto(comments);
+        itemForOwnerDto.setComments(commentDtoList);
     }
 
     private static Booking getLastBooking(List<Booking> bookings) {

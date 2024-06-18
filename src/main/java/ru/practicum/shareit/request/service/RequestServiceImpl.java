@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -72,18 +73,12 @@ public class RequestServiceImpl implements RequestService {
     public List<RequestWithItemsDto> getAllByUserIdAndPageable(Long userId, Integer from, Integer size) {
         findUserById(userId);
 
-        if (from == null || from < 0) {
-            throw new ValidationException("Неверный индекс страницы", HttpStatus.BAD_REQUEST);
-        }
+        validatePageable(from, size);
 
-        if (size == null || size < 0) {
-            throw new ValidationException("Неверное количество элементов на странице", HttpStatus.BAD_REQUEST);
-        }
-
-        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size, requestsSort);
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, requestsSort);
 
         List<Request> requests = requestRepository
-                .findAllByRequestUserIdNot(userId, page)
+                .findAllByRequestUserIdNot(userId, pageable)
                 .getContent();
 
         List<RequestWithItemsDto> requestWithItemsDtoList = new ArrayList<>();
@@ -129,6 +124,16 @@ public class RequestServiceImpl implements RequestService {
                     log.error(errorText);
                     return new EntityNotFoundException(errorText);
                 });
+    }
+
+    private static void validatePageable(Integer from, Integer size) {
+        if (from == null || from < 0) {
+            throw new ValidationException("Неверный индекс страницы", HttpStatus.BAD_REQUEST);
+        }
+
+        if (size == null || size < 0) {
+            throw new ValidationException("Неверное количество элементов на странице", HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
