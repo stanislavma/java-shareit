@@ -31,41 +31,15 @@ class UserServiceTest {
     private UserDto userDto;
     private User user;
 
-    private UserDto userDtoNotValid;
-    private User userNotValid;
-
-    private UserDto userDtoForUpdate;
-    private User userForUpdate;
-
     @BeforeEach
     void setUp() {
         userDto = UserDto.builder()
                 .id(1L)
-                .name("John Doe")
-                .email("john.doe@example.com")
+                .name("Valid User")
+                .email("valid_user@gmail.com")
                 .build();
 
         user = UserMapper.toEntity(userDto);
-
-        userDtoNotValid = UserDto.builder()
-                .email("ivanov@gmail.com")
-                .build();
-
-        userNotValid = User.builder()
-                .email("ivanov@gmail.com")
-                .build();
-
-        userDtoForUpdate = UserDto.builder()
-                .id(1L)
-                .name("ivanov")
-                .email("ivanov@gmail.com")
-                .build();
-
-        userForUpdate = User.builder()
-                .id(1L)
-                .name("ivanov")
-                .email("ivanov@gmail.com")
-                .build();
     }
 
     @Test
@@ -88,13 +62,13 @@ class UserServiceTest {
         // given
         UserDto updatedUserDto = UserDto.builder()
                 .id(1L)
-                .name("John Smith")
-                .email("john.smith@example.com")
+                .name("Petrov")
+                .email("petr@gmail.com")
                 .build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.saveAndFlush(any(User.class))).thenReturn(UserMapper.toEntity(updatedUserDto));
-        when(userRepository.findByEmail("john.smith@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("petr@gmail.com")).thenReturn(Optional.empty());
 
         UserDto result = userService.update(updatedUserDto);
 
@@ -104,7 +78,7 @@ class UserServiceTest {
         assertEquals(updatedUserDto.getEmail(), result.getEmail());
 
         verify(userRepository).findById(1L);
-        verify(userRepository).findByEmail("john.smith@example.com");
+        verify(userRepository).findByEmail("petr@gmail.com");
         verify(userRepository).saveAndFlush(any(User.class));
     }
 
@@ -112,12 +86,12 @@ class UserServiceTest {
     void update_whenEmailExists_thenThrowValidationException() {
         UserDto updatedUserDto = UserDto.builder()
                 .id(1L)
-                .name("John Smith")
-                .email("existing.email@example.com")
+                .name("Petr")
+                .email("petr@gmail.com")
                 .build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.findByEmail("existing.email@example.com")).thenReturn(Optional.of(new User()));
+        when(userRepository.findByEmail("petr@gmail.com")).thenReturn(Optional.of(new User()));
 
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             userService.update(updatedUserDto);
@@ -125,7 +99,7 @@ class UserServiceTest {
 
         assertEquals("Email уже имеется в системе", exception.getMessage());
         verify(userRepository).findById(1L);
-        verify(userRepository).findByEmail("existing.email@example.com");
+        verify(userRepository).findByEmail("petr@gmail.com");
         verify(userRepository, never()).saveAndFlush(any());
     }
 
@@ -134,8 +108,8 @@ class UserServiceTest {
         // given
         UserDto updatedUserDto = UserDto.builder()
                 .id(2L)
-                .name("Jane Doe")
-                .email("jane.doe@example.com")
+                .name("Ivan")
+                .email("ivanov@gmail.com")
                 .build();
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());

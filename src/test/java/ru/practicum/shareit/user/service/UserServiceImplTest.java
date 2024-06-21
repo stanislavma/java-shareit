@@ -101,7 +101,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getById_shouldThrowException_whenUserDoesNotExist() {
+    void getById_shouldError_whenUserNotExist() {
         long nonExistentUserId = 999L;
 
         Exception exception = assertThrows(EntityNotFoundException.class, () -> {

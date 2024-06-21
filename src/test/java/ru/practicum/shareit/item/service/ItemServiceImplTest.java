@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -70,10 +69,10 @@ class ItemServiceImplTest {
     @Test
     void update_shouldUpdate_whenItemIsValid() {
         ItemDto itemDto = makeItemDto("item_2", "description_2", true);
-        ItemDto savedItem = service.add(itemDto, userDto.getId());
+        ItemDto addedItem = service.add(itemDto, userDto.getId());
 
         ItemDto updateItemDto = ItemDto.builder()
-                .id(savedItem.getId())
+                .id(addedItem.getId())
                 .name("updated_item_2")
                 .description("updated_description_2")
                 .available(false)
@@ -81,7 +80,7 @@ class ItemServiceImplTest {
 
         ItemDto updatedItem = service.update(updateItemDto, userDto.getId());
 
-        assertThat(updatedItem.getId(), equalTo(savedItem.getId()));
+        assertThat(updatedItem.getId(), equalTo(addedItem.getId()));
         assertThat(updatedItem.getName(), equalTo(updateItemDto.getName()));
         assertThat(updatedItem.getDescription(), equalTo(updateItemDto.getDescription()));
         assertThat(updatedItem.getAvailable(), equalTo(updateItemDto.getAvailable()));
@@ -124,7 +123,7 @@ class ItemServiceImplTest {
 
     @Test
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    void getById_shouldThrowException_whenItemDoesNotExist() {
+    void getById_shouldError_whenItemExist() {
 
         long nonExistentItemId = 999L;
 
