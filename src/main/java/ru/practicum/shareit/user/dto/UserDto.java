@@ -23,7 +23,7 @@ public class UserDto implements Serializable {
 
     private Long id;
 
-    @NotEmpty
+    @NotEmpty(message = "Не должно быть пустым")
     private String name;
 
     @NotEmpty(message = "Адрес электронной почты не может быть пустым")

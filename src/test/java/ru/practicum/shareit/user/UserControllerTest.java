@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,9 +17,10 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,16 +35,18 @@ class UserControllerTest {
     @MockBean
     private UserService userServiceMock;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private UserDto userDto;
 
     @BeforeEach
     void setUp() {
         userDto = UserDto.builder()
                 .id(1L)
-                .name("ivanov")
+                .name("Ivan")
                 .email("ivanov@gmail.com")
                 .build();
-
     }
 
     @Test
@@ -87,22 +91,86 @@ class UserControllerTest {
 
         when(userServiceMock.getById(nonExistentUserId)).thenThrow(new EntityNotFoundException(expectedErrorMessage));
 
-        mockMvc.perform(get("/users/999")
+        mockMvc.perform(get("/users/" + nonExistentUserId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value(expectedErrorMessage));
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage));
     }
 
     @Test
-    void add() {
+    void add_shouldReturnCreatedUser_whenUserIsValid() throws Exception {
+        when(userServiceMock.add(any(UserDto.class))).thenReturn(userDto);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userDto.getId()))
+                .andExpect(jsonPath("$.name").value(userDto.getName()))
+                .andExpect(jsonPath("$.email").value(userDto.getEmail()));
     }
 
     @Test
-    void update() {
+    void add_shouldReturnBadRequest_whenNameIsEmpty() throws Exception {
+        UserDto invalidUserDto = UserDto.builder()
+                .name("")
+                .email("ivanov@gmail.com")
+                .build();
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidUserDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("{name=Не должно быть пустым}"));
     }
 
     @Test
-    void delete() {
+    void add_shouldReturnBadRequest_whenEmailIsInvalid() throws Exception {
+        UserDto invalidUserDto = UserDto.builder()
+                .name("Ivan")
+                .email("ivanov-gmail.com")
+                .build();
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidUserDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("{email=Формат адреса электронной почты неверный!}"));
+    }
+
+    @Test
+    void add_shouldReturnBadRequest_whenEmailIsEmpty() throws Exception {
+        UserDto invalidUserDto = UserDto.builder()
+                .name("Ivan")
+                .email("")
+                .build();
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidUserDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("{email=Адрес электронной почты не может быть пустым}"));
+    }
+
+    @Test
+    void update_shouldReturnUpdatedUser_whenUserIsValid() throws Exception {
+        when(userServiceMock.update(any(UserDto.class))).thenReturn(userDto);
+
+        mockMvc.perform(patch("/users/{userId}", userDto.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userDto.getId()))
+                .andExpect(jsonPath("$.name").value(userDto.getName()))
+                .andExpect(jsonPath("$.email").value(userDto.getEmail()));
+    }
+
+    @Test
+    void delete_shouldReturnNoContent_whenUserDeleted() throws Exception {
+        mockMvc.perform(delete("/users/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(1));
     }
 
 }

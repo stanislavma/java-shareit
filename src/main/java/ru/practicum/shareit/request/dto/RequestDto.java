@@ -21,7 +21,7 @@ public class RequestDto implements Serializable {
 
     Long requestorId;
 
-    @NotEmpty
+    @NotEmpty(message = "Не должно быть пустым")
     String description;
 
     @JsonProperty("created")

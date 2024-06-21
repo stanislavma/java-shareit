@@ -54,7 +54,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDto>> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                           @RequestParam(defaultValue = "ALL") String state,
+                                                            @RequestParam(defaultValue = "ALL") String state,
                                                             @RequestParam(defaultValue = "0") int from,
                                                             @RequestParam(defaultValue = "10") int size) {
         log.info("Получить все бронирования пользователя");
