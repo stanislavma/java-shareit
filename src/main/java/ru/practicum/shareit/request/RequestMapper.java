@@ -8,8 +8,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class RequestMapper {
 
@@ -61,13 +59,6 @@ public static RequestWithItemsDto toEntityWithItemsDto(Request request) {
                 .items(null)
                 .build();
     }
-
-    public static List<RequestDto> toDto(List<Request> requests) {
-        return requests.stream()
-                .map(RequestMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
 
     public static Request toEntity(RequestDto dto, User requestUser) {
         if (dto == null) {

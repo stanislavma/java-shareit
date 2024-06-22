@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class BookingServiceImplTest {
+class BookingServiceIntegrationTest {
 
     private final BookingService bookingService;
 

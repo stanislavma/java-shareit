@@ -124,7 +124,7 @@ public class RequestServiceImpl implements RequestService {
                 });
     }
 
-    private static void validatePageable(Integer from, Integer size) {
+    static void validatePageable(Integer from, Integer size) {
         if (from == null || from < 0) {
             throw new ValidationException("Неверный индекс страницы", HttpStatus.BAD_REQUEST);
         }
