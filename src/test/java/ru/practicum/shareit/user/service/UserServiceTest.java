@@ -150,7 +150,7 @@ class UserServiceTest {
         verify(userRepository).findByEmail("not_equals_email@gmail.com");
         verify(userRepository).saveAndFlush(any(User.class));
     }
-    
+
     @Test
     void update_shouldNotUpdateUser_whenNoFieldIsUpdated() {
         UserDto updatedUserDto = UserDto.builder()
