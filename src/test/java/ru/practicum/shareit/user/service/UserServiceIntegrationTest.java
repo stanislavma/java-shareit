@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class UserServiceImplTest {
+class UserServiceIntegrationTest {
 
     private final UserService service;
 

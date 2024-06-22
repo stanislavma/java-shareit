@@ -182,9 +182,8 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.findByEmail("petr@gmail.com")).thenReturn(Optional.of(new User()));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            userService.update(updatedUserDto);
-        });
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.update(updatedUserDto));
 
         assertEquals("Email уже имеется в системе", exception.getMessage());
         verify(userRepository).findById(1L);
@@ -202,9 +201,8 @@ class UserServiceTest {
 
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            userService.update(updatedUserDto);
-        });
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> userService.update(updatedUserDto));
 
         assertEquals("Пользователь не найден: 2", exception.getMessage());
         verify(userRepository).findById(2L);

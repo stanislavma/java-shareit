@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class ItemServiceImplTest {
+class ItemServiceIntegrationTest {
 
     @MockBean
     private BookingService bookingService;
