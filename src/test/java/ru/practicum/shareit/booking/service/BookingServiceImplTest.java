@@ -149,9 +149,8 @@ class BookingServiceImplTest {
     void getById_shouldError_whenBookingNotExist() {
         long nonExistentBookingId = 999L;
 
-        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
-            bookingService.getById(userDto.getId(), nonExistentBookingId);
-        });
+        Exception exception = assertThrows(EntityNotFoundException.class,
+                () -> bookingService.getById(userDto.getId(), nonExistentBookingId));
 
         assertThat(exception.getMessage(), containsString("Бронирование не найдено: " + nonExistentBookingId));
     }

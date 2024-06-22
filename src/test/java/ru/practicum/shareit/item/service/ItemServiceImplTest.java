@@ -127,9 +127,8 @@ class ItemServiceImplTest {
 
         long nonExistentItemId = 999L;
 
-        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
-            service.getById(userDto.getId(), nonExistentItemId);
-        });
+        Exception exception = assertThrows(EntityNotFoundException.class,
+                () -> service.getById(userDto.getId(), nonExistentItemId));
 
         assertThat(exception.getMessage(), containsString("Вещь не найдена: " + nonExistentItemId));
     }

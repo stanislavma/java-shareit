@@ -78,7 +78,9 @@ class BookingRepositoryTest {
 
     @Test
     void testFindByBookerIdCurrent() {
-        List<Booking> bookings = bookingRepository.findByBookerIdCurrent(userBooker.getId(), LocalDateTime.now().plusDays(1));
+        List<Booking> bookings = bookingRepository
+                .findByBookerIdCurrent(userBooker.getId(), LocalDateTime.now().plusHours(36));
+
         assertThat(bookings).isNotEmpty();
 
         Booking foundBooking = bookings.get(0);
@@ -89,7 +91,9 @@ class BookingRepositoryTest {
     @Test
     void testFindByBookerIdAndEndDateIsBefore() {
         Pageable pageable = PageRequest.of(0, 10);
-        List<Booking> bookings = bookingRepository.findByBookerIdAndEndDateIsBefore(userBooker.getId(), LocalDateTime.now().plusDays(3), pageable);
+        List<Booking> bookings = bookingRepository
+                .findByBookerIdAndEndDateIsBefore(userBooker.getId(), LocalDateTime.now().plusDays(3), pageable);
+
         assertThat(bookings).isNotEmpty();
 
         Booking foundBooking = bookings.get(0);
@@ -100,7 +104,9 @@ class BookingRepositoryTest {
     @Test
     void testFindByBookerIdAndStartDateIsAfter() {
         Pageable pageable = PageRequest.of(0, 10);
-        List<Booking> bookings = bookingRepository.findByBookerIdAndStartDateIsAfter(userBooker.getId(), LocalDateTime.now(), pageable);
+        List<Booking> bookings = bookingRepository
+                .findByBookerIdAndStartDateIsAfter(userBooker.getId(), LocalDateTime.now(), pageable);
+
         assertThat(bookings).isNotEmpty();
 
         Booking foundBooking = bookings.get(0);
@@ -111,7 +117,9 @@ class BookingRepositoryTest {
     @Test
     void testFindByBookerIdAndStatus() {
         Pageable pageable = PageRequest.of(0, 10);
-        List<Booking> bookings = bookingRepository.findByBookerIdAndStatus(userBooker.getId(), BookingStatus.WAITING, pageable);
+        List<Booking> bookings = bookingRepository
+                .findByBookerIdAndStatus(userBooker.getId(), BookingStatus.WAITING, pageable);
+
         assertThat(bookings).isNotEmpty();
 
         Booking foundBooking = bookings.get(0);
@@ -133,7 +141,9 @@ class BookingRepositoryTest {
 
     @Test
     void testFindCurrentBookingsByOwner() {
-        List<Booking> bookings = bookingRepository.findCurrentBookingsByOwner(userOwner.getId(), LocalDateTime.now().plusDays(1));
+        List<Booking> bookings = bookingRepository
+                .findCurrentBookingsByOwner(userOwner.getId(), LocalDateTime.now().plusHours(36));
+
         assertThat(bookings).isNotEmpty();
 
         Booking foundBooking = bookings.get(0);
@@ -144,7 +154,9 @@ class BookingRepositoryTest {
     @Test
     void testFindByItemOwnerIdAndEndDateIsBefore() {
         Pageable pageable = PageRequest.of(0, 10);
-        List<Booking> bookings = bookingRepository.findByItemOwnerIdAndEndDateIsBefore(userOwner.getId(), LocalDateTime.now().plusDays(3), pageable);
+        List<Booking> bookings = bookingRepository
+                .findByItemOwnerIdAndEndDateIsBefore(userOwner.getId(), LocalDateTime.now().plusDays(3), pageable);
+
         assertThat(bookings).isNotEmpty();
 
         Booking foundBooking = bookings.get(0);

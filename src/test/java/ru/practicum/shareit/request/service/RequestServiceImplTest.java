@@ -45,7 +45,7 @@ class RequestServiceImplTest {
         userDto = userService.add(makeUserDto("user_1", "user_1_" +
                 System.currentTimeMillis() + "@gmail.com"));
 
-        userDtoAnother = userService.add(makeUserDto("user_another", "user_another" +
+        userDtoAnother = userService.add(makeUserDto("user_another", "user_another_" +
                 System.currentTimeMillis() + "@gmail.com"));
     }
 
@@ -73,7 +73,8 @@ class RequestServiceImplTest {
         RequestDto requestDto = makeRequestDto("Request description");
         requestService.add(requestDto, userDto.getId());
 
-        List<RequestWithItemsDto> requests = requestService.getAllByUserIdAndPageable(userDtoAnother.getId(), 0, 10);
+        List<RequestWithItemsDto> requests =
+                requestService.getAllByUserIdAndPageable(userDtoAnother.getId(), 0, 10);
 
         assertThat(requests, hasItem(hasProperty("description", equalTo(requestDto.getDescription()))));
     }
@@ -94,9 +95,8 @@ class RequestServiceImplTest {
     void getRequestById_shouldError_whenNotExist() {
         long nonExistentRequestId = 999L;
 
-        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
-            requestService.getRequestById(userDto.getId(), nonExistentRequestId);
-        });
+        Exception exception = assertThrows(EntityNotFoundException.class, () ->
+                requestService.getRequestById(userDto.getId(), nonExistentRequestId));
 
         assertThat(exception.getMessage(), containsString("Запрос на вещь не найден: " + nonExistentRequestId));
     }
@@ -114,4 +114,5 @@ class RequestServiceImplTest {
                 .email(email)
                 .build();
     }
+
 }

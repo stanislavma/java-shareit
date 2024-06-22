@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ItemRepositoryIntegrationTest {
+class ItemRepositoryTest {
 
     @Autowired
     private ItemRepository itemRepository;
@@ -91,12 +91,12 @@ class ItemRepositoryIntegrationTest {
 
     @Test
     void testFindAllByRequestId() {
-        Long requestId = 1L; // assuming the request ID exists
+        Long requestId = 1L;
         Sort sort = Sort.by(Sort.Direction.ASC, "name");
 
         List<Item> items = itemRepository.findAllByRequestId(requestId, sort);
 
-        assertThat(items).isEmpty(); // as we have not set requestId for items, it should be empty
+        assertThat(items).isEmpty();
     }
 
 }

@@ -103,13 +103,12 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private Request getRequestById(Long requestId) {
-        Request request = requestRepository.findById(requestId)
+        return requestRepository.findById(requestId)
                 .orElseThrow(() -> {
                     String errorText = "Запрос на вещь не найден: " + requestId;
                     log.error(errorText);
                     return new EntityNotFoundException(errorText);
                 });
-        return request;
     }
 
     private List<ItemDto> getItemsByRequestId(Long requestId) {
