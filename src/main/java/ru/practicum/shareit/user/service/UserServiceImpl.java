@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -20,8 +21,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDto add(UserDto userDto) {
-        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
+        return UserMapper.toDto(userRepository.save(UserMapper.toEntity(userDto)));
     }
 
     @Override
@@ -40,7 +42,7 @@ public class UserServiceImpl implements UserService {
             existingUser.setEmail(userDto.getEmail());
         }
 
-        return UserMapper.toUserDto(userRepository.saveAndFlush(UserMapper.toUser(existingUser)));
+        return UserMapper.toDto(userRepository.saveAndFlush(UserMapper.toEntity(existingUser)));
     }
 
     private void validateIsEmailExist(UserDto userDto) {
@@ -58,10 +60,11 @@ public class UserServiceImpl implements UserService {
                     return new EntityNotFoundException(errorText);
                 });
 
-        return UserMapper.toUserDto(user);
+        return UserMapper.toDto(user);
     }
 
     @Override
+    @Transactional
     public void delete(long userId) {
         getById(userId);
 
@@ -70,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll() {
-        return UserMapper.toUserDto(userRepository.findAll());
+        return UserMapper.toDto(userRepository.findAll());
     }
 
 }

@@ -28,8 +28,8 @@ public class BookingMapper {
         String startDate = DATE_TIME_FORMATTER.format(booking.getStartDate());
         String endDate = DATE_TIME_FORMATTER.format(booking.getEndDate());
 
-        ItemDto itemDto = ItemMapper.toItemDto(booking.getItem());
-        UserDto bookerDto = UserMapper.toUserDto(booking.getBooker());
+        ItemDto itemDto = ItemMapper.toDto(booking.getItem());
+        UserDto bookerDto = UserMapper.toDto(booking.getBooker());
 
         return BookingDto.builder()
                 .id(booking.getId())

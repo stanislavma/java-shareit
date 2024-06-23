@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.request.RequestRepository;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -44,18 +48,19 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-
     private final Sort itemsSort = Sort.by(Sort.Direction.ASC, "id");
+    private final RequestRepository requestRepository;
 
     @Override
     @Transactional()
     public ItemDto add(ItemDto itemDto, Long userId) {
         User user = findUserById(userId);
+        Request request = findRequestById(itemDto.getRequestId());
 
-        Item item = ItemMapper.toItem(itemDto, user, null);
+        Item item = ItemMapper.toEntity(itemDto, user, request);
         item.setOwner(user);
 
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        return ItemMapper.toDto(itemRepository.save(item));
     }
 
     @Override
@@ -81,17 +86,20 @@ public class ItemServiceImpl implements ItemService {
             existingItem.setAvailable(itemDto.getAvailable());
         }
 
-        return ItemMapper.toItemDto(itemRepository.save(existingItem));
+        return ItemMapper.toDto(itemRepository.save(existingItem));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemForOwnerDto> getItemsByOwnerId(Long userId) {
-        List<Item> items = itemRepository.findAllByOwnerId(userId, itemsSort);
+    public List<ItemForOwnerDto> getItemsByOwnerId(Long userId, Integer from, Integer size) {
+        validatePageable(from, size);
+
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, itemsSort);
+        List<Item> items = itemRepository.findAllByOwnerId(userId, pageable);
 
         List<ItemForOwnerDto> itemForOwnerDtoList = new ArrayList<>();
         for (Item item : items) {
-            ItemForOwnerDto itemForOwnerDto = ItemMapper.toItemForOwnerDto(item);
+            ItemForOwnerDto itemForOwnerDto = ItemMapper.toEntityForOwnerDto(item);
 
             setBookingsToItem(userId, item, itemForOwnerDto);
             setCommentsToItem(item, itemForOwnerDto);
@@ -104,11 +112,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ItemDto> getItemsByRequestId(Long requestId) {
+        List<Item> items = itemRepository.findAllByRequestId(requestId, itemsSort);
+
+        return ItemMapper.toDto(items);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ItemForOwnerDto getById(Long userId, Long itemId) {
         findUserById(userId);
         Item item = getItemById(itemId);
 
-        ItemForOwnerDto itemForOwnerDto = ItemMapper.toItemForOwnerDto(item);
+        ItemForOwnerDto itemForOwnerDto = ItemMapper.toEntityForOwnerDto(item);
 
         setBookingsToItem(userId, item, itemForOwnerDto);
         setCommentsToItem(item, itemForOwnerDto);
@@ -118,12 +134,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getItemsByText(String text) {
+    public List<ItemDto> getItemsByText(String text, Integer from, Integer size) {
+        validatePageable(from, size);
+
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
         }
 
-        return ItemMapper.toItemDto(itemRepository.findByText(text));
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, itemsSort);
+        return ItemMapper.toDto(itemRepository.findByText(text, pageable));
     }
 
     @Override
@@ -132,7 +151,8 @@ public class ItemServiceImpl implements ItemService {
         User author = findUserById(userId);
         Item item = getItemById(itemId);
 
-        List<BookingDto> bookingDtoList = bookingService.getAllByBookerId(userId, BookingState.PAST.name());
+        List<BookingDto> bookingDtoList =
+                bookingService.getAllByBookerId(userId, BookingState.PAST.name(), 0, 100);
 
         boolean hasValidBooking = bookingDtoList.stream()
                 .anyMatch(booking -> booking.getItemId()
@@ -145,6 +165,39 @@ public class ItemServiceImpl implements ItemService {
         Comment comment = CommentMapper.toEntity(commentDto, item, author);
 
         return CommentMapper.toDto(commentRepository.save(comment));
+    }
+
+    private Item getItemById(Long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> {
+                    String errorText = "Вещь не найдена: " + itemId;
+                    log.error(errorText);
+                    return new EntityNotFoundException(errorText);
+                });
+    }
+
+    private User findUserById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    String errorText = "Пользователь не найден: " + userId;
+                    log.error(errorText);
+                    return new EntityNotFoundException(errorText);
+                });
+    }
+
+    private Request findRequestById(Long requestId) {
+        Request request = null;
+
+        if (requestId != null && requestId > 0) {
+            request = requestRepository.findById(requestId)
+                    .orElseThrow(() -> {
+                        String errorText = "Запрос на вещь не найден: " + requestId;
+                        log.error(errorText);
+                        return new EntityNotFoundException(errorText);
+                    });
+        }
+
+        return request;
     }
 
     private void setBookingsToItem(Long userId, Item item, ItemForOwnerDto itemForOwnerDto) {
@@ -166,25 +219,6 @@ public class ItemServiceImpl implements ItemService {
         itemForOwnerDto.setComments(commentDtoList);
     }
 
-
-    private Item getItemById(Long itemId) {
-        return itemRepository.findById(itemId)
-                .orElseThrow(() -> {
-                    String errorText = "Вещь не найдена: " + itemId;
-                    log.error(errorText);
-                    return new EntityNotFoundException(errorText);
-                });
-    }
-
-    private User findUserById(long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    String errorText = "Пользователь не найден: " + userId;
-                    log.error(errorText);
-                    return new EntityNotFoundException(errorText);
-                });
-    }
-
     private static Booking getLastBooking(List<Booking> bookings) {
         return bookings.stream()
                 .filter(b -> b.getStatus().equals(BookingStatus.APPROVED))
@@ -199,6 +233,16 @@ public class ItemServiceImpl implements ItemService {
                 .filter(b -> b.getStartDate().isAfter(LocalDateTime.now()))
                 .min(Comparator.comparing(Booking::getStartDate))
                 .orElse(null);
+    }
+
+    private static void validatePageable(Integer from, Integer size) {
+        if (from == null || from < 0) {
+            throw new ValidationException("Неверный индекс страницы", HttpStatus.BAD_REQUEST);
+        }
+
+        if (size == null || size < 0) {
+            throw new ValidationException("Неверное количество элементов на странице", HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

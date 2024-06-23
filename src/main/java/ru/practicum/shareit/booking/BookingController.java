@@ -45,16 +45,20 @@ public class BookingController {
 
     @GetMapping()
     public ResponseEntity<List<BookingDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                   @RequestParam(defaultValue = "ALL") String state) {
+                                                   @RequestParam(defaultValue = "ALL") String state,
+                                                   @RequestParam(defaultValue = "0") int from,
+                                                   @RequestParam(defaultValue = "10") int size) {
         log.info("Получить все бронирования");
-        return ResponseEntity.ok(bookingService.getAllByBookerId(userId, state));
+        return ResponseEntity.ok(bookingService.getAllByBookerId(userId, state, from, size));
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<List<BookingDto>> getAllByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                           @RequestParam(defaultValue = "ALL") String state) {
+    public ResponseEntity<List<BookingDto>> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                            @RequestParam(defaultValue = "ALL") String state,
+                                                            @RequestParam(defaultValue = "0") int from,
+                                                            @RequestParam(defaultValue = "10") int size) {
         log.info("Получить все бронирования пользователя");
-        return ResponseEntity.ok(bookingService.getAllByOwnerId(userId, state));
+        return ResponseEntity.ok(bookingService.getAllByOwnerId(userId, state, from, size));
     }
 
 }

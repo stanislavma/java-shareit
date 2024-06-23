@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class UserMapper {
 
-    public static UserDto toUserDto(User user) {
+    public static UserDto toDto(User user) {
         if (user == null) {
             return null;
         }
@@ -20,13 +20,13 @@ public class UserMapper {
                 .build();
     }
 
-    public static List<UserDto> toUserDto(List<User> users) {
+    public static List<UserDto> toDto(List<User> users) {
         return users.stream()
-                .map(UserMapper::toUserDto)
+                .map(UserMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public static User toUser(UserDto dto) {
+    public static User toEntity(UserDto dto) {
         if (dto == null) {
             return null;
         }

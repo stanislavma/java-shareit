@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemForOwnerDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.Request;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class ItemMapper {
 
-    public static ItemDto toItemDto(Item item) {
+    public static ItemDto toDto(Item item) {
         if (item == null) {
             return null;
         }
@@ -26,14 +26,14 @@ public class ItemMapper {
                 .build();
     }
 
-    public static List<ItemDto> toItemDto(List<Item> items) {
+    public static List<ItemDto> toDto(List<Item> items) {
         return items.stream()
-                .map(ItemMapper::toItemDto)
+                .map(ItemMapper::toDto)
                 .collect(Collectors.toList());
     }
 
 
-    public static ItemForOwnerDto toItemForOwnerDto(Item item) {
+    public static ItemForOwnerDto toEntityForOwnerDto(Item item) {
         if (item == null) {
             return null;
         }
@@ -51,13 +51,13 @@ public class ItemMapper {
     }
 
 
-    public static List<ItemForOwnerDto> toItemForOwnerDto(List<Item> items) {
+    public static List<ItemForOwnerDto> toEntityForOwnerDto(List<Item> items) {
         return items.stream()
-                .map(ItemMapper::toItemForOwnerDto)
+                .map(ItemMapper::toEntityForOwnerDto)
                 .collect(Collectors.toList());
     }
 
-    public static Item toItem(ItemDto dto, User owner, Request request) {
+    public static Item toEntity(ItemDto dto, User owner, Request request) {
         if (dto == null) {
             return null;
         }
