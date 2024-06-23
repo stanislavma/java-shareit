@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -9,9 +8,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.RequestRepository;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,34 +28,22 @@ class ItemRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User user;
-
-    @BeforeEach
-    void setUp() {
-        user = new User();
-        user.setEmail("user_owner@gmail.com");
-        user.setName("Owner User");
-        user = userRepository.save(user);
-
-        Item item1 = new Item();
-        item1.setOwner(user);
-        item1.setName("Test Item 1");
-        item1.setDescription("Description for test item 1");
-        item1.setAvailable(true);
-        itemRepository.save(item1);
-
-        Item item2 = new Item();
-        item2.setOwner(user);
-        item2.setName("Test Item 2");
-        item2.setDescription("Description for test item 2");
-        item2.setAvailable(true);
-        itemRepository.save(item2);
-    }
+    @Autowired
+    private RequestRepository requestRepository;
 
     @Test
     void testFindAllByOwnerId() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
+
+        User user = createUser("user_owner@gmail.com", "Owner User");
+        createItem(user, "Test Item 1", "Description for test item 1", null);
+        createItem(user, "Test Item 2", "Description for test item 2", null);
+
+        //that
         List<Item> items = itemRepository.findAllByOwnerId(user.getId(), pageable);
+
+        //then
         assertThat(items).hasSize(2);
 
         Item foundItem1 = items.stream().filter(item -> item.getName().equals("Test Item 1"))
@@ -73,8 +63,17 @@ class ItemRepositoryTest {
 
     @Test
     void testFindByText() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
+
+        User user = createUser("user_owner@gmail.com", "Owner User");
+        createItem(user, "Test Item 1", "Description for test item 1", null);
+        createItem(user, "Test Item 2", "Description for test item 2", null);
+
+        //that
         List<Item> items = itemRepository.findByText("test item", pageable);
+
+        //then
         assertThat(items).hasSize(2);
 
         Item foundItem1 = items.stream().filter(item -> item.getName().equals("Test Item 1")).findFirst().orElse(null);
@@ -91,12 +90,44 @@ class ItemRepositoryTest {
 
     @Test
     void testFindAllByRequestId() {
-        Long requestId = 1L;
+        //given
         Sort sort = Sort.by(Sort.Direction.ASC, "name");
+        User user = createUser("user_owner@gmail.com", "Owner User");
+        Request request = createRequest(user);
+        createItem(user, "Test Item 1", "Description for test item 1", request);
 
-        List<Item> items = itemRepository.findAllByRequestId(requestId, sort);
+        //that
+        List<Item> items = itemRepository.findAllByRequestId(request.getId(), sort);
 
-        assertThat(items).isEmpty();
+        //then
+        assertThat(items).hasSize(1);
+        assertThat(items.get(0).getName()).isEqualTo("Test Item 1");
+    }
+
+    private User createUser(String email, String name) {
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        return userRepository.save(user);
+    }
+
+    private Request createRequest(User user) {
+        Request request = new Request();
+        request.setRequestUser(user);
+        request.setDescription("Описание необходимого товара");
+        request.setCreatedDate(LocalDateTime.now());
+        request = requestRepository.save(request);
+        return request;
+    }
+
+    private Item createItem(User user, String name, String description, Request request) {
+        Item item = new Item();
+        item.setOwner(user);
+        item.setName(name);
+        item.setDescription(description);
+        item.setAvailable(true);
+        item.setRequest(request);
+        return itemRepository.save(item);
     }
 
 }

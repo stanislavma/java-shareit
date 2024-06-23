@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -18,19 +17,15 @@ class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User user;
-
-    @BeforeEach
-    void setUp() {
-        user = new User();
-        user.setEmail("ivanov@gmail.com");
-        user.setName("Ivan");
-        user = userRepository.save(user);
-    }
-
     @Test
     void testFindByEmail() {
+        //given
+        User user = createUser("ivanov@gmail.com", "Ivan");
+
+        //that
         Optional<User> foundUser = userRepository.findByEmail(user.getEmail());
+
+        //then
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getEmail()).isEqualTo(user.getEmail());
         assertThat(foundUser.get().getName()).isEqualTo(user.getName());
@@ -38,29 +33,47 @@ class UserRepositoryTest {
 
     @Test
     void testSaveUser() {
-        User newUser = new User();
-        newUser.setEmail("petrov@gmail.com");
-        newUser.setName("Petr");
-        User savedUser = userRepository.save(newUser);
+        //given that
+        User newUser = createUser("petrov@gmail.com", "Petr");
 
-        assertThat(savedUser).isNotNull();
-        assertThat(savedUser.getId()).isNotNull();
-        assertThat(savedUser.getEmail()).isEqualTo(newUser.getEmail());
-        assertThat(savedUser.getName()).isEqualTo(newUser.getName());
+        //then
+        assertThat(newUser).isNotNull();
+        assertThat(newUser.getId()).isNotNull();
+        assertThat(newUser.getEmail()).isEqualTo("petrov@gmail.com");
+        assertThat(newUser.getName()).isEqualTo("Petr");
     }
 
     @Test
     void testDeleteUser() {
+        //given
+        User user = createUser("ivanov@gmail.com", "Ivan");
+
+        //that
         userRepository.delete(user);
+
+        //then
         Optional<User> deletedUser = userRepository.findById(user.getId());
         assertThat(deletedUser).isNotPresent();
     }
 
     @Test
     void testFindById() {
+        //given
+        User user = createUser("ivanov@gmail.com", "Ivan");
+
+        //that
         Optional<User> foundUser = userRepository.findById(user.getId());
+
+        //then
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getId()).isEqualTo(user.getId());
+    }
+
+    private User createUser(String email, String name) {
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        return userRepository.save(user);
     }
 
 }

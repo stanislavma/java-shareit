@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -33,44 +32,21 @@ class BookingRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
 
-    private User userBooker;
-    private User userOwner;
-    private Item item;
-
-    @BeforeEach
-    void setUp() {
-        userBooker = new User();
-        userBooker.setEmail("user_booker@gmail.com");
-        userBooker.setName("Test User Booker");
-        userBooker = userRepository.save(userBooker);
-
-        userOwner = new User();
-        userOwner.setEmail("user_owner@gmail.com");
-        userOwner.setName("User Owner");
-        userOwner = userRepository.save(userOwner);
-
-        item = new Item();
-        item.setOwner(userOwner);
-        item.setName("Test Item");
-        item.setDescription("Item Description");
-        item.setAvailable(true);
-        item = itemRepository.save(item);
-
-        Booking booking = new Booking();
-        booking.setItem(item);
-        booking.setBooker(userBooker);
-        booking.setStartDate(LocalDateTime.now().plusDays(1));
-        booking.setEndDate(LocalDateTime.now().plusDays(2));
-        booking.setStatus(BookingStatus.WAITING);
-        bookingRepository.save(booking);
-    }
-
     @Test
     void testFindAllByBookerId() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
-        List<Booking> bookings = bookingRepository.findAllByBookerId(userBooker.getId(), pageable);
-        assertThat(bookings).hasSize(1);
 
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
+        List<Booking> bookings = bookingRepository.findAllByBookerId(userBooker.getId(), pageable);
+
+        //then
+        assertThat(bookings).hasSize(1);
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -78,11 +54,18 @@ class BookingRepositoryTest {
 
     @Test
     void testFindByBookerIdCurrent() {
+        //given
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
         List<Booking> bookings = bookingRepository
                 .findByBookerIdCurrent(userBooker.getId(), LocalDateTime.now().plusHours(36));
 
+        //then
         assertThat(bookings).isNotEmpty();
-
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -90,12 +73,20 @@ class BookingRepositoryTest {
 
     @Test
     void testFindByBookerIdAndEndDateIsBefore() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
+
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
         List<Booking> bookings = bookingRepository
                 .findByBookerIdAndEndDateIsBefore(userBooker.getId(), LocalDateTime.now().plusDays(3), pageable);
 
+        //then
         assertThat(bookings).isNotEmpty();
-
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -103,12 +94,19 @@ class BookingRepositoryTest {
 
     @Test
     void testFindByBookerIdAndStartDateIsAfter() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
         List<Booking> bookings = bookingRepository
                 .findByBookerIdAndStartDateIsAfter(userBooker.getId(), LocalDateTime.now(), pageable);
 
+        //then
         assertThat(bookings).isNotEmpty();
-
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -116,12 +114,20 @@ class BookingRepositoryTest {
 
     @Test
     void testFindByBookerIdAndStatus() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
+
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
         List<Booking> bookings = bookingRepository
                 .findByBookerIdAndStatus(userBooker.getId(), BookingStatus.WAITING, pageable);
 
+        //then
         assertThat(bookings).isNotEmpty();
-
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -130,10 +136,19 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByItemOwner() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
-        List<Booking> bookings = bookingRepository.findAllByItemOwner(userOwner.getId(), pageable);
-        assertThat(bookings).isNotEmpty();
 
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
+        List<Booking> bookings = bookingRepository.findAllByItemOwner(userOwner.getId(), pageable);
+
+        //then
+        assertThat(bookings).isNotEmpty();
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -141,11 +156,18 @@ class BookingRepositoryTest {
 
     @Test
     void testFindCurrentBookingsByOwner() {
+        //given
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
         List<Booking> bookings = bookingRepository
                 .findCurrentBookingsByOwner(userOwner.getId(), LocalDateTime.now().plusHours(36));
 
+        //then
         assertThat(bookings).isNotEmpty();
-
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -153,12 +175,20 @@ class BookingRepositoryTest {
 
     @Test
     void testFindByItemOwnerIdAndEndDateIsBefore() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
+
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
         List<Booking> bookings = bookingRepository
                 .findByItemOwnerIdAndEndDateIsBefore(userOwner.getId(), LocalDateTime.now().plusDays(3), pageable);
 
+        //then
         assertThat(bookings).isNotEmpty();
-
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -166,10 +196,19 @@ class BookingRepositoryTest {
 
     @Test
     void testFindByItemOwnerIdAndStartDateIsAfter() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
-        List<Booking> bookings = bookingRepository.findByItemOwnerIdAndStartDateIsAfter(userOwner.getId(), LocalDateTime.now(), pageable);
-        assertThat(bookings).isNotEmpty();
 
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
+        List<Booking> bookings = bookingRepository.findByItemOwnerIdAndStartDateIsAfter(userOwner.getId(), LocalDateTime.now(), pageable);
+
+        //then
+        assertThat(bookings).isNotEmpty();
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -177,10 +216,19 @@ class BookingRepositoryTest {
 
     @Test
     void testFindByItemOwnerIdAndStatus() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
-        List<Booking> bookings = bookingRepository.findByItemOwnerIdAndStatus(userOwner.getId(), BookingStatus.WAITING, pageable);
-        assertThat(bookings).isNotEmpty();
 
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
+        List<Booking> bookings = bookingRepository.findByItemOwnerIdAndStatus(userOwner.getId(), BookingStatus.WAITING, pageable);
+
+        //then
+        assertThat(bookings).isNotEmpty();
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
@@ -189,12 +237,48 @@ class BookingRepositoryTest {
 
     @Test
     void testFindAllByItemId() {
+        //given
         Sort sort = Sort.by(Sort.Direction.DESC, "startDate");
-        List<Booking> bookings = bookingRepository.findAllByItemId(item.getId(), sort);
-        assertThat(bookings).isNotEmpty();
 
+        User userBooker = createUser("user_booker@gmail.com", "Test User Booker");
+        User userOwner = createUser("user_owner@gmail.com", "User Owner");
+        Item item = createItem(userOwner, "Test Item", "Item Description");
+        createBooking(userBooker, item, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2), BookingStatus.WAITING);
+
+        //that
+        List<Booking> bookings = bookingRepository.findAllByItemId(item.getId(), sort);
+
+        //then
+        assertThat(bookings).isNotEmpty();
         Booking foundBooking = bookings.get(0);
         assertThat(foundBooking.getItem().getName()).isEqualTo("Test Item");
         assertThat(foundBooking.getBooker().getName()).isEqualTo("Test User Booker");
     }
+
+    private User createUser(String email, String name) {
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        return userRepository.save(user);
+    }
+
+    private Item createItem(User owner, String name, String description) {
+        Item item = new Item();
+        item.setOwner(owner);
+        item.setName(name);
+        item.setDescription(description);
+        item.setAvailable(true);
+        return itemRepository.save(item);
+    }
+
+    private Booking createBooking(User booker, Item item, LocalDateTime startDate, LocalDateTime endDate, BookingStatus status) {
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStartDate(startDate);
+        booking.setEndDate(endDate);
+        booking.setStatus(status);
+        return bookingRepository.save(booking);
+    }
+
 }

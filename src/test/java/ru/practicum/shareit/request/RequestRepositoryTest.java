@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -28,34 +27,18 @@ class RequestRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User requestorUser;
-    private User anotherUser;
-
-    @BeforeEach
-    void setUp() {
-        requestorUser = new User();
-        requestorUser.setEmail("requestor_user@gmail.com");
-        requestorUser.setName("Test Requestor User");
-        requestorUser = userRepository.save(requestorUser);
-
-        anotherUser = new User();
-        anotherUser.setEmail("another_user@gmail.com");
-        anotherUser.setName("Another User");
-        anotherUser = userRepository.save(anotherUser);
-
-        Request request = new Request();
-        request.setRequestUser(requestorUser);
-        request.setDescription("Test Request");
-        request.setCreatedDate(LocalDateTime.now());
-        requestRepository.save(request);
-    }
-
     @Test
     void testFindAllByRequestUserId() {
+        //given
         Sort sort = Sort.by(Sort.Direction.ASC, "createdDate");
-        List<Request> requests = requestRepository.findAllByRequestUserId(requestorUser.getId(), sort);
-        assertThat(requests).hasSize(1);
+        User requestorUser = createUser("requestor_user@gmail.com", "Test Requestor User");
+        createRequest(requestorUser, "Test Request");
 
+        //that
+        List<Request> requests = requestRepository.findAllByRequestUserId(requestorUser.getId(), sort);
+
+        //then
+        assertThat(requests).hasSize(1);
         Request foundRequest = requests.get(0);
         assertThat(foundRequest.getDescription()).isEqualTo("Test Request");
         assertThat(foundRequest.getRequestUser().getName()).isEqualTo("Test Requestor User");
@@ -63,13 +46,35 @@ class RequestRepositoryTest {
 
     @Test
     void testFindAllByRequestUserIdNot() {
+        //given
         Pageable pageable = PageRequest.of(0, 10);
-        List<Request> requests = requestRepository.findAllByRequestUserIdNot(anotherUser.getId(), pageable).getContent();
-        assertThat(requests).hasSize(1);
+        User requestorUser = createUser("requestor_user@gmail.com", "Test Requestor User");
+        User anotherUser = createUser("another_user@gmail.com", "Another User");
+        createRequest(requestorUser, "Test Request");
 
+        //that
+        List<Request> requests = requestRepository.findAllByRequestUserIdNot(anotherUser.getId(), pageable).getContent();
+
+        //then
+        assertThat(requests).hasSize(1);
         Request foundRequest = requests.get(0);
         assertThat(foundRequest.getDescription()).isEqualTo("Test Request");
         assertThat(foundRequest.getRequestUser().getName()).isEqualTo("Test Requestor User");
+    }
+
+    private User createUser(String email, String name) {
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        return userRepository.save(user);
+    }
+
+    private Request createRequest(User requestorUser, String description) {
+        Request request = new Request();
+        request.setRequestUser(requestorUser);
+        request.setDescription(description);
+        request.setCreatedDate(LocalDateTime.now());
+        return requestRepository.save(request);
     }
 
 }

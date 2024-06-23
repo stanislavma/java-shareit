@@ -53,7 +53,7 @@ class RequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User(1L, "User", "user@example.com");
+        user = new User(1L, "User", "user@gmail.com");
         requestDto = RequestDto.builder()
                 .id(1L)
                 .description("Request Description")
