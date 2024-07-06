@@ -73,6 +73,25 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M5</version>
+				<configuration>
+					<environmentVariables>
+						<SERVER_PORT>9090</SERVER_PORT>
+						<POSTGRES_DB>shareit</POSTGRES_DB>
+						<POSTGRES_USER>postgres</POSTGRES_USER>
+						<POSTGRES_PASSWORD>postgres</POSTGRES_PASSWORD>
+						<POSTGRES_HOST>localhost</POSTGRES_HOST>
+						<POSTGRES_PORT>5432</POSTGRES_PORT>
+						<GATEWAY_PORT>8080</GATEWAY_PORT>
+						<SHAREIT_SERVER_URL>http://localhost:9090</SHAREIT_SERVER_URL>
+					</environmentVariables>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 
