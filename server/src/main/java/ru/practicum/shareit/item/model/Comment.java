@@ -1,11 +1,10 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import org.hibernate.annotations.Type;
 import ru.practicum.shareit.user.model.User;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 
 @Builder
