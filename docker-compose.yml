@@ -28,7 +28,6 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
     ports:
       - "9090:9090"
-      - "9091:9091"
 
   gateway:
     image: shareit_gateway_image:latest
