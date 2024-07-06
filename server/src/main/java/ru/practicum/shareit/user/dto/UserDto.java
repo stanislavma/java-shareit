@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 /**

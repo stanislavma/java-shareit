@@ -22,7 +22,7 @@ public class RequestClient extends BaseClient {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
+                        .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
                         .build()
         );
     }

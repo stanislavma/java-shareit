@@ -4,8 +4,8 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Builder
@@ -38,8 +38,7 @@ public class Comment {
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
-    @Column(name = "text")
-    @Type(type = "org.hibernate.type.TextType")
+    @Column(name = "text", columnDefinition = "TEXT")
     private String text;
 
 }

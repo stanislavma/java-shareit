@@ -4,7 +4,7 @@ import lombok.*;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * Вещь

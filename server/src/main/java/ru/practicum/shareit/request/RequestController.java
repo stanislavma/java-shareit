@@ -9,7 +9,7 @@ import ru.practicum.shareit.request.dto.RequestForOwnerDto;
 import ru.practicum.shareit.request.dto.RequestWithItemsDto;
 import ru.practicum.shareit.request.service.RequestService;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**
