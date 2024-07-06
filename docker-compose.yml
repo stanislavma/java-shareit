@@ -18,7 +18,7 @@ services:
       retries: 10
 
   server:
-    image: shareit_server_image:latest
+    image: stasma/shareit_server_image:latest
     container_name: shareit-server
     depends_on:
      - db
@@ -33,7 +33,7 @@ services:
       - "9090:9090"
 
   gateway:
-    image: shareit_gateway_image:latest
+    image: stasma/shareit_gateway_image:latest
     container_name: shareit-gateway
     depends_on:
       server:
