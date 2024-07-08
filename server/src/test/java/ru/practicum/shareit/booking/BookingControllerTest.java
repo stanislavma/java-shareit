@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,7 +59,7 @@ class BookingControllerTest {
 
         mockMvc.perform(post("/bookings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(bookingDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(bookingDto.getId()))
@@ -78,7 +79,7 @@ class BookingControllerTest {
 
         mockMvc.perform(post("/bookings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(invalidBookingDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("{itemId=Бронируемая вещь является обязательным полем}"));
@@ -94,7 +95,7 @@ class BookingControllerTest {
 
         mockMvc.perform(post("/bookings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(invalidBookingDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("{startDate=Дата начала бронирования является обязательным полем}"));
@@ -110,7 +111,7 @@ class BookingControllerTest {
 
         mockMvc.perform(post("/bookings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(invalidBookingDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("{endDate=Дата завершения бронирования является обязательным полем}"));
@@ -124,7 +125,7 @@ class BookingControllerTest {
 
         mockMvc.perform(patch("/bookings/{bookingId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .param("approved", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(bookingDto.getId()))
@@ -138,7 +139,7 @@ class BookingControllerTest {
 
         mockMvc.perform(get("/bookings/{bookingId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(X_SHARER_USER_ID, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(bookingDto.getId()))
                 .andExpect(jsonPath("$.itemId").value(bookingDto.getItemId()))
@@ -156,7 +157,7 @@ class BookingControllerTest {
 
         mockMvc.perform(get("/bookings/{bookingId}", nonExistentBookingId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(X_SHARER_USER_ID, 1L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
     }
@@ -168,7 +169,7 @@ class BookingControllerTest {
 
         mockMvc.perform(get("/bookings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .param("state", "ALL")
                         .param("from", "0")
                         .param("size", "10"))
@@ -188,7 +189,7 @@ class BookingControllerTest {
 
         mockMvc.perform(get("/bookings/owner")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .param("state", "ALL")
                         .param("from", "0")
                         .param("size", "10"))

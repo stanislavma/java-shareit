@@ -17,12 +17,12 @@ import java.io.Serializable;
 @Jacksonized
 public class RequestDto implements Serializable {
 
-    Long id;
+    private Long id;
 
-    Long requestorId;
+    private Long requestorId;
 
     @NotEmpty(message = "Не должно быть пустым")
-    String description;
+    private String description;
 
     @JsonProperty("created")
     private String createdDate;

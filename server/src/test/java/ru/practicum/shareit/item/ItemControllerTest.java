@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -73,7 +74,7 @@ class ItemControllerTest {
 
         mockMvc.perform(post("/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(itemDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(itemDto.getId()))
@@ -92,7 +93,7 @@ class ItemControllerTest {
 
         mockMvc.perform(post("/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(invalidItemDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("{name=Имя вещи является обязательным!}"));
@@ -108,7 +109,7 @@ class ItemControllerTest {
 
         mockMvc.perform(post("/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(invalidItemDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("{description=Описание вещи не может быть пустым!}"));
@@ -121,7 +122,7 @@ class ItemControllerTest {
 
         mockMvc.perform(patch("/items/{itemId}", itemDto.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(itemDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(itemDto.getId()))
@@ -137,7 +138,7 @@ class ItemControllerTest {
 
         mockMvc.perform(get("/items/{itemId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(X_SHARER_USER_ID, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(itemForOwnerDto.getId()))
                 .andExpect(jsonPath("$.name").value(itemForOwnerDto.getName()))
@@ -154,7 +155,7 @@ class ItemControllerTest {
 
         mockMvc.perform(get("/items/{itemId}", nonExistentItemId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(X_SHARER_USER_ID, 1L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
     }
@@ -166,7 +167,7 @@ class ItemControllerTest {
 
         mockMvc.perform(get("/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .param("from", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -202,7 +203,7 @@ class ItemControllerTest {
 
         mockMvc.perform(post("/items/{itemId}/comment", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(commentDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(commentDto.getId()))
@@ -217,7 +218,7 @@ class ItemControllerTest {
 
         mockMvc.perform(post("/items/{itemId}/comment", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(invalidCommentDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("{text=Комментарий является обязательным полем}"));

@@ -12,6 +12,8 @@ import ru.practicum.shareit.item.service.ItemService;
 import jakarta.validation.Valid;
 import java.util.List;
 
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
+
 @RestController
 @Slf4j
 @AllArgsConstructor
@@ -22,28 +24,28 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemDto> add(@Valid @RequestBody ItemDto itemDto,
-                                       @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                       @RequestHeader(X_SHARER_USER_ID) Long userId) {
         log.info("Добавление новой вещи {}", itemDto);
         return ResponseEntity.ok(itemService.add(itemDto, userId));
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> update(@PathVariable Long itemId, @RequestBody ItemDto itemDto,
-                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                          @RequestHeader(X_SHARER_USER_ID) Long userId) {
         log.info("Обновление вещи с ID {}", itemId);
         itemDto.setId(itemId);
         return ResponseEntity.ok(itemService.update(itemDto, userId));
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemForOwnerDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<ItemForOwnerDto> getById(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                                    @PathVariable Long itemId) {
         log.info("Получить вещь по ID - {}", itemId);
         return ResponseEntity.ok(itemService.getById(userId, itemId));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemForOwnerDto>> getItemsByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<List<ItemForOwnerDto>> getItemsByOwnerId(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                                                    @RequestParam(defaultValue = "0") int from,
                                                                    @RequestParam(defaultValue = "10") int size) {
         log.info("Получить все вещи владельца - {}", userId);
@@ -59,7 +61,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<CommentDto> addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<CommentDto> addComment(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                                  @PathVariable Long itemId,
                                                  @Valid @RequestBody CommentDto commentDto) {
         log.info("Добавить комментарий к вещи с ID - {}", itemId);

@@ -12,6 +12,8 @@ import ru.practicum.shareit.request.service.RequestService;
 import jakarta.validation.Valid;
 import java.util.List;
 
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
+
 /**
  * Requests for item rest controller
  */
@@ -25,19 +27,19 @@ public class RequestController {
 
     @PostMapping
     public ResponseEntity<RequestDto> add(@Valid @RequestBody RequestDto requestDto,
-                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                          @RequestHeader(X_SHARER_USER_ID) Long userId) {
         log.info("Добавление нового запроса на вещь {}", requestDto);
         return ResponseEntity.ok(requestService.add(requestDto, userId));
     }
 
     @GetMapping
-    public ResponseEntity<List<RequestForOwnerDto>> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<List<RequestForOwnerDto>> getAllByOwnerId(@RequestHeader(X_SHARER_USER_ID) Long userId) {
         log.info("Получить все запросы владельца - {}", userId);
         return ResponseEntity.ok(requestService.getAllByOwnerId(userId));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<RequestWithItemsDto>> getAllByUserIdAndPageable(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<List<RequestWithItemsDto>> getAllByUserIdAndPageable(@RequestHeader(X_SHARER_USER_ID) long userId,
                                                                                @RequestParam(defaultValue = "0") int from,
                                                                                @RequestParam(defaultValue = "10") int size) {
         log.info("Получение всех запросов, кроме тех, у которых requestorId равен {}", userId);
@@ -45,7 +47,7 @@ public class RequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<RequestWithItemsDto> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<RequestWithItemsDto> getById(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                                        @PathVariable Long requestId) {
         log.info("Получить вещь по ID - {}", requestId);
         return ResponseEntity.ok(requestService.getRequestById(userId, requestId));

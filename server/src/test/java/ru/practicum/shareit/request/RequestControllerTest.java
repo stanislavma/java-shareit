@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -68,7 +69,7 @@ class RequestControllerTest {
 
         mockMvc.perform(post("/requests")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(requestDto.getId()))
@@ -83,7 +84,7 @@ class RequestControllerTest {
 
         mockMvc.perform(post("/requests")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .content(objectMapper.writeValueAsString(invalidRequestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("{description=Не должно быть пустым}"));
@@ -95,7 +96,7 @@ class RequestControllerTest {
 
         mockMvc.perform(get("/requests")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(X_SHARER_USER_ID, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(requestForOwnerDto.getId()))
@@ -108,7 +109,7 @@ class RequestControllerTest {
 
         mockMvc.perform(get("/requests/all")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(X_SHARER_USER_ID, 1L)
                         .param("from", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -123,7 +124,7 @@ class RequestControllerTest {
 
         mockMvc.perform(get("/requests/{requestId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(X_SHARER_USER_ID, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(requestWithItemsDto.getId()))
                 .andExpect(jsonPath("$.description").value(requestWithItemsDto.getDescription()));
@@ -138,7 +139,7 @@ class RequestControllerTest {
 
         mockMvc.perform(get("/requests/{requestId}", nonExistentRequestId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(X_SHARER_USER_ID, 1L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
     }

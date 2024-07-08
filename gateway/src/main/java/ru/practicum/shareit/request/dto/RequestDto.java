@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -16,12 +17,12 @@ import java.io.Serializable;
 @Jacksonized
 public class RequestDto implements Serializable {
 
-    Long id;
+    private Long id;
 
-    Long requestorId;
+    private Long requestorId;
 
-    @NotEmpty(message = "Не должно быть пустым")
-    String description;
+    @NotBlank(message = "Не должно быть пустым")
+    private String description;
 
     @JsonProperty("created")
     private String createdDate;

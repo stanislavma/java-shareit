@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.practicum.shareit.booking.dto.BookingDto;
 
+import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
+
 @Controller
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
@@ -23,13 +25,13 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<Object> add(@Valid @RequestBody BookingDto bookingDto,
-                                      @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                      @RequestHeader(X_SHARER_USER_ID) Long userId) {
         log.info("Добавление нового бронирования {}", bookingDto);
         return bookingClient.add(bookingDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseEntity<Object> updateStatus(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> updateStatus(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                                @PathVariable Long bookingId,
                                                @RequestParam boolean approved) {
         log.info("Обновление бронирования с ID {}", bookingId);
@@ -37,14 +39,14 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<Object> getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getById(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                           @PathVariable Long bookingId) {
         log.info("Получить бронирование по ID - {}", bookingId);
         return bookingClient.getById(userId, bookingId);
     }
 
     @GetMapping()
-    public ResponseEntity<Object> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getAll(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                          @RequestParam(defaultValue = "ALL") String state,
                                          @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                          @Positive @RequestParam(defaultValue = "10") int size) {
@@ -53,7 +55,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<Object> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> getAllByOwnerId(@RequestHeader(X_SHARER_USER_ID) Long userId,
                                                   @RequestParam(defaultValue = "ALL") String state,
                                                   @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                                   @Positive @RequestParam(defaultValue = "10") int size) {
