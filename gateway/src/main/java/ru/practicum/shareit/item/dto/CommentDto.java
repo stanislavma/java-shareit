@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,7 +25,9 @@ public class CommentDto implements Serializable {
     @JsonProperty("created")
     private String createdDate;
 
-    @NotEmpty(message = "Комментарий является обязательным полем")
+    @NotNull
+    @NotBlank(message = "Комментарий является обязательным полем")
+    @Size(max = 300, message = "Максимальная длина - 300 символов")
     private String text;
 
 }

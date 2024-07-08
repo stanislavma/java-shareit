@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.RequestDto;
 
@@ -12,8 +13,8 @@ import static ru.practicum.shareit.common.Constants.X_SHARER_USER_ID;
 /**
  * Requests for item rest controller
  */
-@RestController
 @Slf4j
+@Controller
 @AllArgsConstructor
 @RequestMapping(path = "/requests")
 public class RequestController {
