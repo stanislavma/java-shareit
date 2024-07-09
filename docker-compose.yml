@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16.1
+    container_name: shareit-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: shareit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d shareit -U postgres"]
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  server:
+    image: stasma/shareit_server_image:latest
+    container_name: shareit-server
+    depends_on:
+     - db
+    environment:
+      SERVER_PORT: 9090
+      POSTGRES_DB: shareit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+    ports:
+      - "9090:9090"
+
+  gateway:
+    image: stasma/shareit_gateway_image:latest
+    container_name: shareit-gateway
+    depends_on:
+      server:
+        condition: service_started
+    environment:
+      GATEWAY_PORT: 8080
+      SHAREIT_SERVER_URL: http://server:9090
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
